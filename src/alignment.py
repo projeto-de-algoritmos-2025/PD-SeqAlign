@@ -7,3 +7,5 @@ def alignment(a='', b=''):
     }
 
     return a, b, log
+
+# gap char: □ (U+25A1)

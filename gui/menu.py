@@ -22,14 +22,14 @@ class App():
         menu_bt.grid(row=0, column=0, sticky="se")
         
         tk.Label(frame, text="Sequência A:").grid(row=1, column=0, sticky='w')
-        tk.Entry(frame, textvariable=self.a).grid(row=2, column=0, pady=(0, 8), sticky='ew')
+        tk.Entry(frame, textvariable=self.a, font=("Consolas", 10)).grid(row=2, column=0, pady=(0, 8), sticky='ew')
         tk.Label(frame, text="Sequência B:").grid(row=3, column=0, sticky='w')
-        tk.Entry(frame, textvariable=self.b).grid(row=4, column=0, pady=(0, 8), sticky='ew')
+        tk.Entry(frame, textvariable=self.b, font=("Consolas", 10)).grid(row=4, column=0, pady=(0, 8), sticky='ew')
 
-        tk.Button(frame, text="Alinhar", width=8, command=self.on_align) \
+        tk.Button(frame, text="Alinhar", width=9, command=self.on_align) \
             .grid(row=5, column=0, sticky='sw')
-        tk.Button(frame, text="Sair", width=8, command=self.root.destroy) \
-            .grid(row=5, column=0, padx=(66, 0), sticky='sw')
+        tk.Button(frame, text="Sair", width=9, command=self.root.destroy) \
+            .grid(row=5, column=0, padx=(72, 0), sticky='sw')
 
         frame.grid_columnconfigure(0, weight=1)
         frame.grid_rowconfigure(5, weight=1)
@@ -57,7 +57,7 @@ class App():
         frame.pack(fill='both', expand=True)
         
         tk.Label(frame, text="Alinhamento:").grid(row=0, column=0, sticky='w')
-        text = tk.Text(frame, height=2, width=32, wrap='none', font=("Arial", 16))
+        text = tk.Text(frame, height=2, width=32, wrap='none', font=("Consolas", 16))
         text.insert('1.0', a+'\n'+b), text.config(state='disabled'), text.grid(row=1, column=0, sticky='we')
 
         def scroll(event, text_widget):
