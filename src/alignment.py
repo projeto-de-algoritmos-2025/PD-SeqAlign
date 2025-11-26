@@ -1,5 +1,5 @@
 
-def alignment(a='', b=''):
+def alignment(config, a='', b=''):
 
     log = {
         'gaps': 0,
