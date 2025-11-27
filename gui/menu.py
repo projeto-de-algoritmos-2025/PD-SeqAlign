@@ -7,11 +7,11 @@ class App():
     def __init__(self, root, path):
         self.root = root
         self.path = path
-        self.a, self.b = tk.StringVar(), tk.StringVar()
+        self.x, self.y = tk.StringVar(), tk.StringVar()
         self.config = {
             'gap_weight': 1,
             'mism_weight': 1,
-            'priority': ['Mismatch', 'Gap em X', 'Gap em Y']
+            'priority': ['Match', 'Mismatch', 'Gap em X', 'Gap em Y']
         }
 
         self.root.title("Alinhador de Sequências")
@@ -26,10 +26,10 @@ class App():
         menu_bt.image = img
         menu_bt.grid(row=0, column=0, sticky="se")
         
-        tk.Label(frame, text="Sequência A:").grid(row=1, column=0, sticky='w')
-        tk.Entry(frame, textvariable=self.a, font=("Consolas", 10)).grid(row=2, column=0, pady=(0, 8), sticky='ew')
-        tk.Label(frame, text="Sequência B:").grid(row=3, column=0, sticky='w')
-        tk.Entry(frame, textvariable=self.b, font=("Consolas", 10)).grid(row=4, column=0, pady=(0, 8), sticky='ew')
+        tk.Label(frame, text="Sequência X:").grid(row=1, column=0, sticky='w')
+        tk.Entry(frame, textvariable=self.x, font=("Consolas", 10)).grid(row=2, column=0, pady=(0, 8), sticky='ew')
+        tk.Label(frame, text="Sequência Y:").grid(row=3, column=0, sticky='w')
+        tk.Entry(frame, textvariable=self.y, font=("Consolas", 10)).grid(row=4, column=0, pady=(0, 8), sticky='ew')
 
         tk.Button(frame, text="Alinhar", width=9, command=self.on_align) \
             .grid(row=5, column=0, sticky='sw')
@@ -41,25 +41,26 @@ class App():
 
 
     def on_align(self):
-        if not self.a.get():
-            return messagebox.showwarning('String Vazia', f'A string (a) não pode ser vazia!', parent=self.root)
-        if not self.b.get():
-            return messagebox.showwarning('String Vazia', f'A string (b) não pode ser vazia!', parent=self.root)
+        if not self.x.get():
+            return messagebox.showwarning('String Vazia', f'A string (X) não pode ser vazia!', parent=self.root)
+        if not self.y.get():
+            return messagebox.showwarning('String Vazia', f'A string (Y) não pode ser vazia!', parent=self.root)
         
-        try: 
-            a, b, log = alignment(self.config, self.a.get(), self.b.get())
-            self.alignment(a, b, log)
-        except Exception:
-            messagebox.showerror('Erro', f'Ocorreu um erro no alinhamento.', parent=self.root)
+        #try: 
+        a, b, log = alignment(self.config, self.x.get(), self.y.get())
+        self.alignment(a, b, log)
+        #except Exception:
+        #    messagebox.showerror('Erro', f'Ocorreu um erro no alinhamento.', parent=self.root)
 
 
     def on_export(self, win, a, b, log):
-        try:
-            with open(self.path, "w") as f:
-                f.write(a + '\n' + b + f'\n\ng={log['gaps']}, m={log['mism']}')
+        #try:
+            info = f'matches={log['matches']}, mismatches={len(log['mismatches'])}, x_gaps={log['x_gaps']}, y_gaps={log['y_gaps']}'
+            with open(self.path, "w", encoding='utf-8') as f:
+                f.write(a + '\n' + b + '\n\n' + info)
             messagebox.showinfo('Alinhamento salvo', f'O alinhamento foi salvo em "{self.path}".', parent=win)
-        except Exception: 
-            messagebox.showerror('Erro', f'Ocorreu um erro ao salvar em "{self.path}".', parent=win)
+        #except Exception: 
+        #    messagebox.showerror('Erro', f'Ocorreu um erro ao salvar em "{self.path}".', parent=win)
 
 
     def on_config(self):
@@ -98,15 +99,17 @@ class App():
                 listbox.insert(p-1, f'{p}. '+down), listbox.insert(p, f'{p+1}. '+top), listbox.delete(p+1, p+2)
             listbox.select_clear(0, tk.END)
 
-        def apply(g, m, p): self.config['gap_weight'], self.config['mism_weight'], self.config['priority'][:] = g, m, p
+        def apply(g, m, p):
+            self.config['gap_weight'], self.config['mism_weight'] = g.get(), m.get()
+            self.config['priority'] = ['Match'] + [el[3:] for el in p]
 
-        tk.Button(frame, text="Aplicar", width=8, command=lambda: apply(gap.get(), mism.get(), [el[3:] for el in listbox.get(0, tk.END)])) \
+        tk.Button(frame, text="Aplicar", width=8, command=lambda: apply(gap, mism, listbox.get(0, tk.END))) \
             .grid(row=6, column=0, columnspan=2, padx=(14, 0), sticky='sw')
         tk.Button(frame, text="Voltar", width=8, command=win.destroy) \
             .grid(row=6, column=0, columnspan=2, padx=(80, 0), sticky='sw')
 
         listbox.bind("<Button-1>", lambda event: self.root.after(100, refresh, event), add=True)
-        for i in range(3): listbox.insert(tk.END, f'{i+1}. '+self.config['priority'][i])
+        for i in range(1, 4): listbox.insert(tk.END, f'{i}. '+self.config['priority'][i])
 
 
     def on_help(self):
@@ -124,7 +127,7 @@ class App():
         
         tk.Label(frame, text="Alinhamento:").grid(row=0, column=0, sticky='w')
         text = tk.Text(frame, height=2, width=32, wrap='none', font=("Consolas", 16))
-        text.insert('1.0', a+'\n'+b), text.config(state='disabled'), text.grid(row=1, column=0, sticky='we')
+        text.insert('1.0', 'X: '+a+'\nY: '+b), text.config(state='disabled'), text.grid(row=1, column=0, sticky='we')
 
         def scroll(event, text_widget):
             if event.delta > 0: text_widget.xview_scroll(-1, "units")
@@ -134,7 +137,8 @@ class App():
         scrollbar.grid(row=2, column=0, sticky='we'), text.config(xscrollcommand=scrollbar.set)
         text.bind("<MouseWheel>", lambda event: scroll(event, text)) # Interação do scroll do mouse (vert.) com a scrollbar (hor.)
 
-        string = f"N° de Gaps: {log['gaps']}\nN° de Mismatches: {log['mism']}"
+        string = f"N° de Gaps: {log['x_gaps']+log['y_gaps']} (x: {log['x_gaps']}, y: {log['y_gaps']})\n" \
+                 f"N° de Mismatches: {len(log['mismatches'])}"
         tk.Label(frame, text=string, justify='left').grid(row=3, column=0, pady=(5, 12), sticky='w')
 
         tk.Button(frame, text="Exportar", width=8, command=lambda: self.on_export(win, a, b, log)) \
