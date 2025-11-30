@@ -21,7 +21,7 @@ class App():
         tk.Label(frame, text="Alinhador de\nSequências", font=('sylfaen', 16)) \
             .grid(row=0, column=0, pady=(0, 12), sticky='ew')
         
-        img = tk.PhotoImage(file="./docs/assets/menu.png")
+        img = tk.PhotoImage(file="./docs/assets/icons/menu.png")
         menu_bt = tk.Button(frame, image=img, width=12, height=12, command=self.on_config)
         menu_bt.image = img
         menu_bt.grid(row=0, column=0, sticky="se")
@@ -77,7 +77,7 @@ class App():
         frame.pack()
         
         tk.Label(frame, text="Configurações", font=('sylfaen', 13)).grid(row=0, column=0, sticky='w')
-        img = tk.PhotoImage(file="./docs/assets/help.png")
+        img = tk.PhotoImage(file="./docs/assets/icons/help.png")
         help_bt = tk.Button(frame, image=img, width=16, height=16, command=self.on_help)
         help_bt.image = img
         help_bt.grid(row=0, column=1, sticky="e")
